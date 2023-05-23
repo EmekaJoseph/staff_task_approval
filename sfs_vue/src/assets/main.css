@@ -1,0 +1,15 @@
+@import './base.css';
+
+body {
+  background-color: #2400ee1e;
+}
+
+input:focus,
+select:focus,
+textarea:focus,
+button:focus,
+.page-link:focus {
+  outline: none !important;
+  box-shadow: none !important;
+  /* background-color: none; */
+}
