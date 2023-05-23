@@ -2,7 +2,7 @@
 
 APP FLOW:
 
-Authentication should be handled using Laravel Passport or Sanctum.
+-Authentication should be handled using Laravel Passport or Sanctum. <br>
 A logged in user can either be a staff or an approver
 A logged-in user should belong to a department
 A logged-in staff should be able to add tasks.
