@@ -13,3 +13,7 @@ button:focus,
   box-shadow: none !important;
   /* background-color: none; */
 }
+
+.fs-large {
+  font-size: 5rem;
+}

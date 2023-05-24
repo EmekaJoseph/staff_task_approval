@@ -21,7 +21,6 @@ class TaskController extends BaseController
     // function to create new TASK
     public function taskCreate(Request $req)
     {
-
         // check if user is a staff
         if ($req->user()->role !== 'staff') {
             return response()->json(['error' => 'not a staff'], 203);
@@ -51,6 +50,7 @@ class TaskController extends BaseController
     }
 
 
+
     // function to see all TASKS
     public function taskList(Request $req)
     {
@@ -67,7 +67,7 @@ class TaskController extends BaseController
 
 
 
-    // function to delete un-approved TASKS
+    // function to delete TASKS (strictly un-approved)
     public function taskDelete(Request $req, $task_id)
     {
 
@@ -78,16 +78,18 @@ class TaskController extends BaseController
 
         // make sure task is found and not approved
         $relatedTask = TaskModel::find($task_id);
-        if ($relatedTask) {
-            if ($relatedTask->is_approved == '1') {
-                return response()->json(['error' => 'cannot not delete approved task'], 203);
-            }
-            // delete task
-            $relatedTask->delete();
-            return response()->json(['success' => 'deleted'], 200);
+
+        if (!$relatedTask) {
+            return response()->json(['error' => 'not found'], 203);
         }
 
-        return response()->json(['error' => 'not found'], 203);
+        if ($relatedTask->is_approved == '1') {
+            return response()->json(['error' => 'cannot not delete approved task'], 203);
+        }
+
+        // delete task
+        $relatedTask->delete();
+        return response()->json(['success' => 'deleted'], 200);
     }
 
 
@@ -104,25 +106,31 @@ class TaskController extends BaseController
         $relatedDept = $relatedTask->relatnDept;
         $approver = UserModel::where('dept_id', $relatedDept->dept_id)->where('role', 'approver')->first();
 
-
-        // check if task is found and mark 'completed= 1'
-        if ($relatedTask) {
-            $relatedTask->is_completed = '1';
-            $relatedTask->save();
-
-            // send mail to approver for Approval
-            try {
-                $mailer = new EmailController();
-                $mailer->completedTaskAlert($relatedTask->task_name, $approver->email);
-            } catch (\Throwable $th) {
-                // throw $th;
-            }
-
-            return response()->json(['success' => 'updated successfully'], 200);
+        // check if task is found
+        if (!$relatedTask) {
+            return response()->json(['error' => 'not found'], 400);
         }
 
-        return response()->json(['error' => 'not found'], 203);
+        // check if there is an approver for this Task
+        if (!$approver) {
+            return response()->json(['error' => 'no approver found'], 204);
+        }
+
+        // mark 'completed= 1'
+        $relatedTask->is_completed = '1';
+        $relatedTask->save();
+
+        // send mail to approver for Approval
+        try {
+            $mailer = new EmailController();
+            $mailer->completedTaskAlert($relatedTask->task_name, $approver->email);
+        } catch (\Throwable $th) {
+            // throw $th;
+        }
+
+        return response()->json(['success' => 'updated successfully'], 200);
     }
+
 
 
 
@@ -143,6 +151,9 @@ class TaskController extends BaseController
         return response()->json($taskData, 200);
     }
 
+
+
+
     // function to approve a task
     public function taskApprove(Request $req, $task_id)
     {
@@ -153,25 +164,23 @@ class TaskController extends BaseController
 
         $relatedTask = TaskModel::find($task_id);
 
-        // check if task is found and mark 'is_approved = 1'
-        if ($relatedTask) {
-            $relatedTask->is_approved = '1';
-            $relatedTask->save();
-
-            // send mail
-            try {
-                $relatedUser = $relatedTask->relatnUser;
-                $mailer = new EmailController();
-                $mailer->approvedTaskAlert($relatedTask->task_name, $relatedUser->email);
-            } catch (\Throwable $th) {
-                throw $th;
-            }
-
-            return response()->json(['success' => 'approved successfully'], 200);
+        // check if task is found and then mark 'is_approved = 1'
+        if (!$relatedTask) {
+            return response()->json(['error' => 'not found'], 400);
         }
 
+        $relatedTask->is_approved = '1';
+        $relatedTask->save();
 
+        // send mail
+        try {
+            $relatedUser = $relatedTask->relatnUser;
+            $mailer = new EmailController();
+            $mailer->approvedTaskAlert($relatedTask->task_name, $relatedUser->email);
+        } catch (\Throwable $th) {
+            // throw $th;
+        }
 
-        return response()->json(['error' => 'not found'], 203);
+        return response()->json(['success' => 'approved successfully'], 200);
     }
 }

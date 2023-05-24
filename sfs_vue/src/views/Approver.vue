@@ -22,7 +22,7 @@
                                     <div class="text-center my-5" v-if="isLoading">Loading data...</div>
                                     <div v-else>
                                         <div class="text-center my-5" v-if="!list.length">
-                                            No Tasks available.
+                                            No Tasks available for approval.
                                         </div>
                                         <div v-else class="table-responsive">
                                             <table class="table table-sm">
@@ -33,7 +33,7 @@
                                                         <th>Start</th>
                                                         <th>End</th>
                                                         <th>Status</th>
-                                                        <th>Approve</th>
+                                                        <th></th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -42,13 +42,12 @@
                                                         <td>{{ li.task_name }}</td>
                                                         <td>{{ li.start_date }}</td>
                                                         <td>{{ li.end_date }}</td>
-                                                        <td class="small" v-if="li.is_approved == '0'">Unapproved</td>
-                                                        <td class="text-success small" v-else>Approved</td>
+                                                        <td class="text-success small">Completed</td>
 
                                                         <td>
                                                             <button @click="approveTask(li.task_id)"
                                                                 class="m-0 p-0 px-2 btn btn-outline-success btn-sm">
-                                                                Approve
+                                                                Approve Task
                                                             </button>
                                                         </td>
                                                     </tr>
@@ -104,8 +103,9 @@ const form = reactive({
 async function approveTask(task_id: string) {
     if (confirm('Approve task?')) {
         try {
-            await api.approve(task_id)
+            let resp = await api.approve(task_id)
             getList()
+            alert('Task Approved, Email Sent to Staff.')
         } catch (error) {
             alert('Internet Error')
         }

@@ -29,9 +29,9 @@
                                 <label>End Date:</label>
                                 <input v-model="form.end_date" :min="form.start_date" class="form-control" type="date">
                             </div>
-                            <div class="col-md-2">
+                            <div class="col-lg-2 col-md-4">
                                 <label>&nbsp;</label>
-                                <button @click="addTask" class="btn btn-dark w-100">Add</button>
+                                <button @click="addTask" class="btn btn-dark w-100">Add Task</button>
                             </div>
                         </div>
 
@@ -58,10 +58,16 @@
                                                 </thead>
                                                 <tbody>
                                                     <tr v-for="(li, index) in list" :key="index">
-                                                        <th>{{ (index + 1) }}</th>
-                                                        <td>{{ li.task_name }}</td>
-                                                        <td>{{ li.start_date }}</td>
-                                                        <td>{{ li.end_date }}</td>
+                                                        <th> {{ (index + 1) }} </th>
+                                                        <td :class="{ 'line': li.is_completed == '1' }">
+                                                            {{ li.task_name }}
+                                                        </td>
+                                                        <td :class="{ 'line': li.is_completed == '1' }">
+                                                            {{ li.start_date }}
+                                                        </td>
+                                                        <td :class="{ 'line': li.is_completed == '1' }">
+                                                            {{ li.end_date }}
+                                                        </td>
                                                         <td class="small" v-if="li.is_approved == '0'">Unapproved</td>
                                                         <td class="text-success small" v-else>Approved</td>
                                                         <td v-if="li.is_completed == '0'">
@@ -133,6 +139,11 @@ async function addTask() {
         return;
     }
 
+    if (!(form.start_date <= form.end_date)) {
+        alert('invalid date duration')
+        return;
+    }
+
     try {
         let resp = await api.addTask(form)
         if (resp.status == 203) {
@@ -163,7 +174,11 @@ async function confirmDelete(task_id: string) {
 async function mark_as_complete(task_id: string) {
     if (confirm('Send for approval?')) {
         try {
-            await api.mark_as_complete(task_id)
+            let resp = await api.mark_as_complete(task_id)
+            if (resp.status == 204) {
+                alert('No Approver found in this department, Create an Approver Account')
+                return
+            }
             getList()
         } catch (error) {
             alert('Internet Error')
@@ -189,6 +204,10 @@ async function logOut() {
     width: 100%;
     padding-block: 20px;
     margin-bottom: 40px;
+}
+
+.line {
+    text-decoration: line-through;
 }
 
 /* .entire-page {

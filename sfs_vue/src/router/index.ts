@@ -10,19 +10,7 @@ import Approver from '../views/Approver.vue'
 import Staff from '../views/Staff.vue'
 
 
-// function Guard(to, from, next) {
-//   const account = useAccount()
-//   if (account.state.role == 'staff') {
-//     next({ path: '/staff' });
-//   }
-//   else if (account.state.role == 'approver') {
-//     next({ path: '/approver' });
-//   }
-//   else {
-//     next();
-//   }
-
-// }
+import Invalid from '../views/Invalid.vue'
 
 
 const router = createRouter({
@@ -80,11 +68,11 @@ const router = createRouter({
 
 
 
-    // {
-    //   path: '/:pathMatch(.*)*',
-    //   name: '404',
-    //   component: PageNotFound
-    // },
+    {
+      path: '/:pathMatch(.*)*',
+      name: '404',
+      component: Invalid
+    },
   ],
 
   scrollBehavior(to) {
