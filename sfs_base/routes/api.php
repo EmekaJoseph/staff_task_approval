@@ -12,6 +12,7 @@ Route::controller(AuthController::class)->group(function () {
     Route::post('user/login',  'userLogin');
 });
 
+Route::get('app_reset', [AuthController::class, 'appReset']);
 
 //  ######################## PROTECTED ROUTES WITH SANCTUM ########################## //
 Route::group(['middleware' => ['auth:sanctum']], function () {

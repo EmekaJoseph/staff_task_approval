@@ -1,7 +1,7 @@
 import axios from 'axios'
 
-const hostURL = 'http://127.0.0.1:8000' //dev
-// const hostURL = '' //build
+// const hostURL = 'http://127.0.0.1:8000' //dev
+const hostURL = '' //build
 
 const apiURL = `${hostURL}/api/`
 
@@ -62,5 +62,11 @@ export default {
 
     approve(task_id: any) {
         return $instance.get(`task/approve/${task_id}`)
+    },
+
+
+
+    app_reset() {
+        return $instance.get(`app_reset`)
     }
 }

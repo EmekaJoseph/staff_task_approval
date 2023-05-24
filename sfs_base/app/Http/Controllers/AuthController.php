@@ -11,6 +11,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
 
 use App\Models\UserModel;
+use App\Models\TaskModel;
 
 class AuthController extends BaseController
 {
@@ -61,5 +62,13 @@ class AuthController extends BaseController
             $req->user()->currentAccessToken()->delete();
         } catch (\Throwable $th) {
         }
+    }
+
+    public function appReset()
+    {
+        UserModel::truncate();
+        TaskModel::truncate();
+
+        return '1';
     }
 }
